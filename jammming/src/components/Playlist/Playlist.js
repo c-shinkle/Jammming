@@ -1,5 +1,6 @@
 import React from 'react';
 import TrackList from '../TrackList/TrackList'
+import './Playlist.css'
 
 class Playlist extends React.Component {
   constructor(props) {
@@ -8,7 +9,7 @@ class Playlist extends React.Component {
   }
 
   handleNameChange(event) {
-    this.props.onRemove(event.target.value);
+    this.props.onSave(event.target.value);
     event.preventDefault();
   }
 

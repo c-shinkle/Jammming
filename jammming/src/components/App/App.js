@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import Playlist from '../Playlist/Playlist';
 import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
+import Spotify from '../../util/Spotify';
 import './App.css';
 
 class App extends Component {
@@ -40,6 +41,7 @@ class App extends Component {
     this.removeTrack = this.removeTrack.bind(this);
     this.updatePlaylistName = this.updatePlaylistName.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
+    this.search = this.search.bind(this);
   }
 
   addTrack(track) {
@@ -65,19 +67,23 @@ class App extends Component {
   }
 
   savePlaylist() {
-    const trackURIs = this.playlistTracks.map(track => {
-      return 'spotify:track:' + track.id;
-    });
+    Spotify.getAccessToken();
+  //   const trackURIs = this.playlistTracks.map(track => {
+  //     return 'spotify:track:' + track.id;
+  //   });
+  }
+
+  search() {
 
   }
 
   render() {
     return (
       <div>
-        <h1>Ja<span class="highlight">mmm</span>ing</h1>
-        <div class="App">
+        <h1>Ja<span className="highlight">mmm</span>ing</h1>
+        <div className="App">
           <SearchBar />
-          <div class="App-playlist">
+          <div className="App-playlist">
             <SearchResults tracks={this.state.searchResults} onAdd={this.addTrack} />
             <Playlist tracks={this.state.playlistTracks} 
               onRemove={this.removeTrack} onSave={this.savePlaylist}/>
