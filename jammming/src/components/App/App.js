@@ -67,7 +67,11 @@ class App extends Component {
   }
 
   savePlaylist() {
-    Spotify.getAccessToken();
+    const token = Spotify.getAccessToken();
+    if (token)
+      console.log(token);
+    else 
+      console.log('No token');
   //   const trackURIs = this.playlistTracks.map(track => {
   //     return 'spotify:track:' + track.id;
   //   });

@@ -1,34 +1,30 @@
 const client_id = '04d795ec88be4bb1a4501a58207c6d87';
 //const client_secret = '15cd56bbdc1c4eb09ee198a5dc38bce3';
 const redirect_uri = 'http://localhost:3000/';
-const url = `https://accounts.spotify.com/authorize/?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}`;
+const url = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirect_uri}`;
 
-let token = '';
-let timeDuration = 0;
-let timeStamp = 0;
+let cached_token = '';
 
 const Spotify = {
   getAccessToken() {
-    if (token && Date.now() < timeStamp + timeDuration) {
-      return token;
+    //if we already have a token and it's still valid, return it
+    if (cached_token) {
+      return cached_token;
     }
-    console.log(url);
-    fetch (url, {
-      'Access-Control-Allow-Origin': '*',
-    }).then(response => {
-      console.log(response);
-      if (response.ok) {
-        return response.json();
-      }
-    },(error) => {
-      console.log(error);
-    }).then(jsonRepsonse => {
-      if (!jsonRepsonse)
-        return;
-      console.log(jsonRepsonse);
-      //TODO
-      //assign token, timeDuration, and timeStamp
-    });
+
+    //if we don't have a token or the time has expired, check if we can get a token from #
+    const access_token = window.location.href.match(/access_token=([^&]*)/);
+    const expires_in = window.location.href.match(/expires_in=([^&]*)/);
+    //if both the regexes are good, we have a new token
+    if (access_token && expires_in) {
+      cached_token = access_token[1];
+      window.setTimeout(() => cached_token = '', parseInt(expires_in[1]) * 1000);
+      window.history.pushState(cached_token, null, '/');
+      return cached_token;
+    }
+    
+    //otherwise, get a new token
+    window.location.href = url;
   }
 }
 
