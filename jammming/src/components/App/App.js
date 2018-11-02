@@ -10,30 +10,8 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchResults: [{
-          name: 'Sound of Madness',
-          artist: 'Shinedown',
-          album: 'Sound of Madness',
-        }, {
-          name: 'Enter Sandman',
-          artist: 'Metallica',
-          album: 'Metallica',
-        }, {
-          name: 'A Warrior\'s Call',
-          artist: 'Volbeat',
-          album: 'Beyond Hell/Above Heaven',
-        },
-      ],
-      playlistTracks: [{
-          name: 'Second Chance',
-          artist: 'Shinedown',
-          album: 'Sound of Madness',
-        }, {
-          name: 'Feel Invincible',
-          artist: 'Skillet',
-          album: 'Unleashed',
-        },
-      ],
+      searchResults: [],
+      playlistTracks: [],
       playlistName: '',
     };
 
@@ -49,7 +27,7 @@ class App extends Component {
       return element.id === track.id;
     });
     if (!foundTrack) {
-      let temp = this.state.playlistTracks.split();
+      let temp = this.state.playlistTracks.slice();
       temp.push(track);
       this.setState({playlistTracks: temp});
     }
@@ -67,18 +45,13 @@ class App extends Component {
   }
 
   savePlaylist() {
-    const token = Spotify.getAccessToken();
-    if (token)
-      console.log(token);
-    else 
-      console.log('No token');
-  //   const trackURIs = this.playlistTracks.map(track => {
-  //     return 'spotify:track:' + track.id;
-  //   });
+    
   }
 
-  search() {
-
+  search(term) {
+    Spotify.search(term).then(tracks => {
+      this.setState({searchResults: tracks});
+    });
   }
 
   render() {
@@ -86,10 +59,10 @@ class App extends Component {
       <div>
         <h1>Ja<span className="highlight">mmm</span>ing</h1>
         <div className="App">
-          <SearchBar />
+          <SearchBar onSearch={this.search}/>
           <div className="App-playlist">
             <SearchResults tracks={this.state.searchResults} onAdd={this.addTrack} />
-            <Playlist tracks={this.state.playlistTracks} 
+            <Playlist tracks={this.state.playlistTracks} onNameChange={this.state.updatePlaylistName}
               onRemove={this.removeTrack} onSave={this.savePlaylist}/>
           </div>
         </div>

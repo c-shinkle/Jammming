@@ -11,7 +11,6 @@ const Spotify = {
     if (cached_token) {
       return cached_token;
     }
-
     //if we don't have a token or the time has expired, check if we can get a token from #
     const access_token = window.location.href.match(/access_token=([^&]*)/);
     const expires_in = window.location.href.match(/expires_in=([^&]*)/);
@@ -22,9 +21,31 @@ const Spotify = {
       window.history.pushState(cached_token, null, '/');
       return cached_token;
     }
-    
     //otherwise, get a new token
     window.location.href = url;
+  },
+  search(term) {
+    const token = this.getAccessToken();
+    return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`, {
+      headers: {Authorization: `Bearer ${token}`},
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+    }).then(jsonResponse => {
+      if (jsonResponse.tracks.items) {
+        const tracks = jsonResponse.tracks.items;
+        console.log(tracks);
+        const results = tracks.map(track => ({
+          id: track.id,
+          name: track.name,
+          artist: track.artists[0].name,
+          album: track.album.name,
+          uri: track.uri,
+        }));
+        return results;
+      }
+    });
   }
 }
 
