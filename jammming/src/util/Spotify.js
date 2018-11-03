@@ -1,5 +1,4 @@
 const client_id = '04d795ec88be4bb1a4501a58207c6d87';
-//const client_secret = '15cd56bbdc1c4eb09ee198a5dc38bce3';
 const redirect_uri = 'http://localhost:3000/';
 const url = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirect_uri}`;
 
@@ -7,11 +6,11 @@ let cached_token = '';
 
 const Spotify = {
   getAccessToken() {
-    //if we already have a token and it's still valid, return it
+    //if we already have a token, return it
     if (cached_token) {
       return cached_token;
     }
-    //if we don't have a token or the time has expired, check if we can get a token from #
+    //if we don't have a token, check if we can get a token from #
     const access_token = window.location.href.match(/access_token=([^&]*)/);
     const expires_in = window.location.href.match(/expires_in=([^&]*)/);
     //if both the regexes are good, we have a new token
