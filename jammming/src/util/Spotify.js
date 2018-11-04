@@ -23,7 +23,7 @@ const Spotify = {
     //otherwise, get a new token
     window.location.href = url;
   },
-  search(term) {
+  async search(term) {
     const token = this.getAccessToken();
     return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`, {
       headers: {Authorization: `Bearer ${token}`},
@@ -42,6 +42,62 @@ const Spotify = {
         uri: track.uri,
       }));
     });
+  },
+  async savePlaylist(playlistName, uris) {
+    console.log('savePlaylist entered')
+    if (!playlistName || !uris)
+      return;
+    let token = this.getAccessToken();
+    let headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    //Get user id
+    let user_id = await fetch('https://api.spotify.com/v1/me', {
+      headers: headers,
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+    }).then(jsonResponse => {
+      return jsonResponse.id;
+    });
+    //Create Playlist
+    let playlist_id = await fetch(`https://api.spotify.com/v1/users/${user_id}/playlists`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json', 
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        name: playlistName,
+        public: true,
+      }),
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+    }).then(jsonResponse => {
+      if(jsonResponse) {
+        return jsonResponse.id
+      } else {
+        return '';
+      }
+    });
+    //Populate playlist if it was created successfully
+    if (playlist_id) {
+      return fetch(`https://api.spotify.com/v1/users/${user_id}/playlists/${playlist_id}/tracks`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json', 
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          uris: uris,
+        }),
+      }).then(response => {
+        return response.ok;
+      });
+    }
   }
 }
 
